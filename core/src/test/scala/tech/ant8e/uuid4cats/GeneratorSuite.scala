@@ -27,7 +27,7 @@ class GeneratorSuite extends CatsEffectSuite {
   private val n = 10000
   test("UUIDv1 should generate UUIDs") {
     for {
-      uuids <- UUIDv1.generator[IO]().flatMap(genN(_, n))
+      uuids <- UUIDv1.generator[IO].flatMap(genN(_, n))
       _ <- IO(uuids.allUniques).assert
       _ <- IO(uuids.isSorted).assert
     } yield ()
@@ -35,14 +35,14 @@ class GeneratorSuite extends CatsEffectSuite {
 
   test("UUIDv4 should generate UUIDs") {
     for {
-      uuids <- UUIDv4.generator[IO]().flatMap(genN(_, n))
+      uuids <- UUIDv4.generator[IO].flatMap(genN(_, n))
       _ <- IO(uuids.allUniques).assert
     } yield ()
   }
 
   test("UUIDv6 should generate UUIDs") {
     for {
-      uuids <- UUIDv6.generator[IO]().flatMap(genN(_, n))
+      uuids <- UUIDv6.generator[IO].flatMap(genN(_, n))
       _ <- IO(uuids.allUniques).assert
       _ <- IO(uuids.isSorted).assert
     } yield ()
@@ -50,7 +50,7 @@ class GeneratorSuite extends CatsEffectSuite {
 
   test("UUIDv7 should generate UUIDs") {
     for {
-      uuids <- UUIDv7.generator[IO]().flatMap(genN(_, n))
+      uuids <- UUIDv7.generator[IO].flatMap(genN(_, n))
       _ <- IO(uuids.allUniques).assert
       _ <- IO(uuids.isSorted).assert
     } yield ()

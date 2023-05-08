@@ -34,14 +34,14 @@ object UUIDv1 extends TimestampedUUIDGeneratorBuilder {
     *
     * This function uses a randomized MAC address.
     */
-  def generator[F[_]: Async](): F[UUIDGenerator[F]] =
+  def generator[F[_]: Async]: F[UUIDGenerator[F]] =
     buildGenerator(UUIDBuilder.buildUUIDv1)
 }
 
 object UUIDv4 {
 
   /** return a UUIDv4 (full random) generator. */
-  def generator[F[_]: Async](): F[UUIDGenerator[F]] = SecureRandom
+  def generator[F[_]: Async]: F[UUIDGenerator[F]] = SecureRandom
     .javaSecuritySecureRandom[F]
     .map(random =>
       new UUIDGenerator[F] {
@@ -59,7 +59,7 @@ object UUIDv6 extends TimestampedUUIDGeneratorBuilder {
     * guarantee about the uniqueness of the UUID, even within the same
     * millisecond timestamp.
     */
-  def generator[F[_]: Async](): F[UUIDGenerator[F]] =
+  def generator[F[_]: Async]: F[UUIDGenerator[F]] =
     buildGenerator(UUIDBuilder.buildUUIDv6)
 }
 
@@ -69,7 +69,7 @@ object UUIDv7 extends TimestampedUUIDGeneratorBuilder {
     * guarantee about the uniqueness of the UUID, even within the same
     * millisecond timestamp.
     */
-  def generator[F[_]: Async](): F[UUIDGenerator[F]] =
+  def generator[F[_]: Async]: F[UUIDGenerator[F]] =
     buildGenerator(UUIDBuilder.buildUUIDV7)
 }
 
