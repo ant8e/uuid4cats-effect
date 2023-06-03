@@ -15,8 +15,8 @@ ThisBuild / tlSonatypeUseLegacyHost := false
 // publish website from this branch
 //ThisBuild / tlSitePublishBranch := Some("main")
 
-val Scala213 = "2.13.10"
-ThisBuild / crossScalaVersions := Seq(Scala213, "3.2.1")
+val Scala213 = "2.13.11"
+ThisBuild / crossScalaVersions := Seq(Scala213, "3.3.0")
 ThisBuild / scalaVersion := Scala213 // the default Scala
 
 lazy val root = tlCrossRootProject.aggregate(core)
@@ -28,7 +28,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     name := "uuid4cats-effect",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-core" % "2.9.0",
-      "org.typelevel" %%% "cats-effect" % "3.4.10",
+      "org.typelevel" %%% "cats-effect" % "3.5.0",
       "org.scalameta" %%% "munit" % "0.7.29" % Test,
       "org.typelevel" %%% "munit-cats-effect-3" % "1.0.7" % Test
     )
