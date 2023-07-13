@@ -1,7 +1,7 @@
-ThisBuild / tlBaseVersion := "0.2" // your current series x.y
+ThisBuild / tlBaseVersion := "0.3" // your current series x.y
 
 ThisBuild / organization := "tech.ant8e"
-ThisBuild / organizationName := "Ant8e"
+ThisBuild / organizationName := "Antoine Comte"
 ThisBuild / startYear := Some(2023)
 ThisBuild / licenses := Seq(License.Apache2)
 ThisBuild / developers := List(
