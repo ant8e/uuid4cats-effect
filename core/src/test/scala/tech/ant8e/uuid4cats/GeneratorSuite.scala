@@ -28,30 +28,30 @@ class GeneratorSuite extends CatsEffectSuite {
   test("UUIDv1 should generate UUIDs") {
     for {
       uuids <- UUIDv1.generator[IO].flatMap(genN(_, n))
-      _ <- assertIOBoolean(uuids.allUniques.pure[IO], s"Not unique : $uuids")
+      _ <- assertAllUnique(uuids)
     } yield ()
   }
 
   test("UUIDv4 should generate UUIDs") {
     for {
       uuids <- UUIDv4.generator[IO].flatMap(genN(_, n))
-      _ <- assertIOBoolean(uuids.allUniques.pure[IO], s"Not unique : $uuids")
+      _ <- assertAllUnique(uuids)
     } yield ()
   }
 
   test("UUIDv6 should generate UUIDs") {
     for {
       uuids <- UUIDv6.generator[IO].flatMap(genN(_, n))
-      _ <- assertIOBoolean(uuids.allUniques.pure[IO], s"Not unique : $uuids")
-      _ <- assertIOBoolean(uuids.isSorted.pure[IO], s"Not sorted : $uuids")
+      _ <- assertAllUnique(uuids)
+      _ <- assertSorted(uuids)
     } yield ()
   }
 
   test("UUIDv7 should generate UUIDs") {
     for {
       uuids <- UUIDv7.generator[IO].flatMap(genN(_, n))
-      _ <- assertIOBoolean(uuids.allUniques.pure[IO], s"Not unique : $uuids")
-      _ <- assertIOBoolean(uuids.isSorted.pure[IO], s"Not sorted : $uuids")
+      _ <- assertAllUnique(uuids)
+      _ <- assertSorted(uuids)
     } yield ()
   }
 
@@ -63,7 +63,7 @@ class GeneratorSuite extends CatsEffectSuite {
           List.tabulate(n)(_ => generator.typeid("prefix")).sequence
         )
       _ <- IO(typeids.distinct.size === typeids.size).assert
-      _ <- IO(typeids.sliding(2).toList.forall(l => l.head <= l.last)).assert
+      _ <- IO(isSeqSorted(typeids)).assert
     } yield ()
   }
 
@@ -72,7 +72,45 @@ class GeneratorSuite extends CatsEffectSuite {
 
   implicit class UUIDsOps(uuids: List[UUID]) {
     def allUniques: Boolean = uuids.distinct.size === uuids.size
-    def isSorted: Boolean =
-      uuids.sliding(2).toList.forall(l => l.head <= l.last)
+    def isSorted: Boolean = isSeqSorted(uuids)
   }
+
+  private def assertAllUnique(uuids: List[UUID]) = {
+    assertIOBoolean(uuids.allUniques.pure[IO], s"Not Unique : $uuids")
+  }
+
+  private def assertSorted(uuids: List[UUID]) = {
+    assertIOBoolean(
+      uuids.isSorted.pure[IO],
+      s"Not sorted : ${findNotSorted(uuids)}"
+    )
+  }
+
+  // Using a custom ordering based on String because UUID compareTo() is not reliable
+  // https://github.com/scala-js/scala-js/issues/4882 and
+  // https://bugs.openjdk.org/browse/JDK-7025832
+  implicit val uuidOrdering: Ordering[UUID] =
+    Ordering.by[UUID, String](_.toString)
+
+  def isSeqSorted[T](
+      seq: List[T]
+  )(implicit ordering: Ordering[T]): Boolean = {
+    val lastIndex = seq.length - 1
+    !seq.zipWithIndex.exists { case (t, index) =>
+      index != lastIndex && ordering.gt(t, seq(index + 1))
+    }
+  }
+
+  def findNotSorted[T](seq: List[T])(implicit ordering: Ordering[T]): String = {
+    val lastIndex = seq.length - 1
+    seq.zipWithIndex
+      .find { case (t, index) =>
+        index != lastIndex && ordering.gt(t, seq(index + 1))
+      }
+      .map { case (t, index) =>
+        s"found non sorted values $t ${seq(index + 1)}} at index $index"
+      }
+      .getOrElse("No non sorted values found")
+  }
+
 }

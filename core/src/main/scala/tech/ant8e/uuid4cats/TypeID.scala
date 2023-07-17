@@ -143,6 +143,7 @@ object TypeID {
 
   implicit val typeIDShow: Show[TypeID] = Show.show(_.toString)
   implicit val typeIDOrd: Order[TypeID] = Order.by(_.value)
+  implicit val typeIDOrdering: Ordering[TypeID] = Ordering.by(_.value)
   implicit val typeIDEq: Eq[TypeID] = Eq.instance { case (a, b) =>
     a.prefix === b.prefix && a.uuid === b.uuid
   }
