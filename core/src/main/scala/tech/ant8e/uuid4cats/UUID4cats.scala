@@ -19,6 +19,7 @@ package tech.ant8e.uuid4cats
 import cats.effect.std.{Mutex, Random, SecureRandom}
 import cats.effect.{Async, Clock, Ref}
 import cats.implicits._
+import tech.ant8e.uuid4cats.TimestampedUUIDGeneratorBuilder.GeneratorState
 
 import java.util.UUID
 
@@ -73,11 +74,15 @@ object UUIDv7 extends TimestampedUUIDGeneratorBuilder {
     buildGenerator(UUIDBuilder.buildUUIDV7)
 }
 
+object TimestampedUUIDGeneratorBuilder {
+  private[uuid4cats] case class GeneratorState(
+      lastUsedEpochMillis: Long,
+      sequence: Long
+  )
+}
+
 sealed trait TimestampedUUIDGeneratorBuilder {
   private type UUIDBuilder = (Long, Long, Long) => UUID
-
-  private type GeneratorState = (Long, Long) // Last used Epoch millis, sequence
-
   private def generate[F[_]: Async](
       state: Ref[F, GeneratorState],
       mutex: Mutex[F],
@@ -85,21 +90,33 @@ sealed trait TimestampedUUIDGeneratorBuilder {
       builder: UUIDBuilder
   ): F[UUID] = for {
     random <- random.nextLong
-    uuid <- mutex.lock.surround(for {
-      timestamp <- Clock[F].realTime
-      sequence <- state.modify { case (previousTimestamp, previousSeq) =>
-        val timestampAsMillis = timestamp.toMillis
-        val seq =
-          if (previousTimestamp === timestampAsMillis) previousSeq + 1 else 0L
-        ((timestampAsMillis, seq), seq)
-      }
-    } yield builder(timestamp.toMillis, sequence, random))
+    uuid <- mutex.lock.surround(
+      for {
+        timestamp <- Clock[F].realTime.map(_.toMillis)
+        modifiedState <- state.modify { currentState =>
+          // realTime clock may run backward
+          val actualTimestamp =
+            Math.max(currentState.lastUsedEpochMillis, timestamp)
+          val sequence =
+            if (currentState.lastUsedEpochMillis === actualTimestamp)
+              currentState.sequence + 1
+            else 0L
+
+          val newState = GeneratorState(actualTimestamp, sequence)
+          (newState, newState)
+        }
+      } yield builder(
+        modifiedState.lastUsedEpochMillis,
+        modifiedState.sequence,
+        random
+      )
+    )
   } yield uuid
 
   protected def buildGenerator[F[_]: Async](
       builder: UUIDBuilder
   ): F[UUIDGenerator[F]] = {
-    val generatorInitialState = Ref[F].of(0L -> 0L)
+    val generatorInitialState = Ref[F].of(GeneratorState(0L, 0L))
     for {
       state <- generatorInitialState
       mutex <- Mutex[F]
