@@ -279,9 +279,7 @@ object TypeID {
       out(24) = enc(ls2b(b14) << 3 | ms3b(b15))
       out(25) = enc(ls5b(b15))
 
-      // TODO move the project to CrossType.Full to enable platform specific code
-      // String.copyValueOf(out) only work on the JVM
-      new String(out)
+      PlatformSpecificMethods.stringFromArray(out)
     }
 
     def fromBase32(s: String): Either[String, UUID] = {
