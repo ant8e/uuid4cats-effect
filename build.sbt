@@ -14,6 +14,7 @@ ThisBuild / developers := List(
 // publish to s01.oss.sonatype.org (set to true to publish to oss.sonatype.org instead)
 ThisBuild / tlSonatypeUseLegacyHost := false
 
+ThisBuild / tlFatalWarnings := false
 // publish website from this branch
 //ThisBuild / tlSitePublishBranch := Some("main")
 
@@ -42,3 +43,25 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
   )
 
 lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
+
+ThisBuild / githubWorkflowAddedJobs ++= Seq(
+  WorkflowJob(
+    id = "coverage",
+    name = "Generate coverage report",
+    scalas = List(Scala213),
+    javas = List(githubWorkflowJavaVersions.value.last),
+    steps = List(WorkflowStep.Checkout) ++ WorkflowStep.SetupJava(
+      List(githubWorkflowJavaVersions.value.last)
+    ) ++ githubWorkflowGeneratedCacheSteps.value ++ List(
+      WorkflowStep.Sbt(List("coverage", "rootJVM/test", "coverageAggregate")),
+      WorkflowStep.Use(
+        UseRef.Public(
+          "codecov",
+          "codecov-action",
+          "v3"
+        ),
+        env = Map("CODECOV_TOKEN" -> "${{ secrets.CODECOV_TOKEN }}")
+      )
+    )
+  )
+)
