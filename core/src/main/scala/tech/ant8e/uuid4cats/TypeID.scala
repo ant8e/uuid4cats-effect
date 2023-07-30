@@ -55,9 +55,8 @@ object TypeID {
     .map(uuidGenerator =>
       (prefix: String) =>
         uuidGenerator.uuid.flatMap { uuid =>
-          val typeID = build(prefix, uuid).leftMap(errors =>
-            new IllegalArgumentException(errors.mkString_(", "))
-          )
+          val typeID = build(prefix, uuid)
+            .leftMap(errors => new IllegalArgumentException(errors.show))
           ApplicativeError[F, Throwable].fromValidated(typeID)
         }
     )
@@ -198,9 +197,8 @@ object TypeID {
     override def toString: String = s"TypeID:$repr($uuid_)"
 
     override def equals(obj: Any): Boolean = obj match {
-      case other: TypeID =>
-        this.uuid.equals(other.uuid) && this.prefix.equals(other.prefix)
-      case _ => false
+      case other: TypeID => TypeID.typeIDEq.eqv(this, other)
+      case _             => false
     }
 
   }

@@ -2,6 +2,7 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/tech.ant8e/uuid4cats-effect_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/tech.ant8e/uuid4cats-effect_2.13)
 [![Code of Conduct](https://img.shields.io/badge/Code%20of%20Conduct-Scala-blue.svg)](CODE_OF_CONDUCT.md)
 ![](https://github.com/ant8e/uuid4cats-effect/actions/workflows/ci.yml/badge.svg)
+[![codecov](https://codecov.io/gh/ant8e/uuid4cats-effect/branch/main/graph/badge.svg?token=QEUSQ3T053)](https://codecov.io/gh/ant8e/uuid4cats-effect)
 # uuid4cats-effect -  UUID and TypeID Generation for cats effect
 
 
