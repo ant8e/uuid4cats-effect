@@ -16,6 +16,7 @@
 
 package tech.ant8e.uuid4cats
 
+import cats.Eq
 import cats.data.NonEmptyChain
 import cats.syntax.all._
 import munit.FunSuite
@@ -81,6 +82,20 @@ class TypeIDSuite extends FunSuite {
       prefix = "prefix",
       uuid = uuid"01890a5d-ac96-774b-bcce-b302099a8057"
     )
+  }
+  test("TypeID should not  build invalid typeIDs") {
+    val tooLongPrefix =
+      "0123456789012345678901234567890123456789012345678901234567890123456789"
+    assertInvalidEncoding(
+      tooLongPrefix,
+      uuid"01890a5d-ac96-774b-bcce-b302099a8057"
+    )
+
+    val v4UUID = uuid"3054b437-160c-42ac-9b68-f814f93bfc28"
+    assertInvalidEncoding("prefix", v4UUID)
+
+    assertInvalidEncoding("prefix", null)
+    assertInvalidEncoding(null, uuid"01890a5d-ac96-774b-bcce-b302099a8057")
   }
 
   test("TypeID should decode valid typeIDs") {
@@ -198,7 +213,36 @@ class TypeIDSuite extends FunSuite {
 
     // suffix-overflow
     assertInvalidDecoding(typeID = "prefix_8zzzzzzzzzzzzzzzzzzzzzzzzz")
+
+    // sixteen with mandatory UUIDV7
+    assertInvalidDecoding(
+      typeID = "0000000000000000000000000g",
+      enforceUUIDV7 = true
+    )
+
+    // missing separator
+    assertInvalidDecoding(
+      typeID = "prefix0000000000000000000000000g"
+    )
   }
+
+  test("TypeID should have an Eq instance") {
+    val eq = implicitly[Eq[TypeID]]
+    assert(
+      eq.eqv(
+        TypeID.decode("prefix_01h455vb4pex5vsknk084sn02q").toOption.get,
+        TypeID.decode("prefix_01h455vb4pex5vsknk084sn02q").toOption.get
+      )
+    )
+  }
+
+  test("TypeID should have a Show instance") {
+    assertEquals(
+      TypeID.decode("prefix_01h455vb4pex5vsknk084sn02q").toOption.get.show,
+      "TypeID:prefix_01h455vb4pex5vsknk084sn02q(01890a5d-ac96-774b-bcce-b302099a8057)"
+    )
+  }
+
   private def assertValidEncoding(
       typeID: String,
       prefix: String,
@@ -209,6 +253,17 @@ class TypeIDSuite extends FunSuite {
         .build(prefix = prefix, uuid = uuid, uuid.version() == 7)
         .map(_.value),
       typeID.valid[TypeID.BuildError].toValidatedNec
+    )
+  }
+
+  private def assertInvalidEncoding(
+      prefix: String,
+      uuid: UUID
+  ): Unit = {
+    assert(
+      TypeID
+        .build(prefix = prefix, uuid = uuid)
+        .isInvalid
     )
   }
   private def assertValidDecoding(
@@ -228,8 +283,12 @@ class TypeIDSuite extends FunSuite {
 
     assertEquals(obtained, expected)
   }
-  private def assertInvalidDecoding(typeID: String): Unit = {
-    val obtained = TypeID.decode(typeID)
+
+  private def assertInvalidDecoding(
+      typeID: String,
+      enforceUUIDV7: Boolean = false
+  ): Unit = {
+    val obtained = TypeID.decode(typeID, enforceUUIDV7)
     assert(obtained.isInvalid, s"$typeID should not decode as a valid TypeID")
   }
 

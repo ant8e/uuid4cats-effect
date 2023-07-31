@@ -65,6 +65,23 @@ class GeneratorSuite extends CatsEffectSuite {
       _ <- IO(typeids.distinct.size === typeids.size).assert
       _ <- IO(isSeqSorted(typeids)).assert
     } yield ()
+
+    for {
+      typeids <- TypeID
+        .generator[IO]("prefix")
+        .flatMap(generator => List.tabulate(n)(_ => generator()).sequence)
+      _ <- IO(typeids.distinct.size === typeids.size).assert
+      _ <- IO(isSeqSorted(typeids)).assert
+    } yield ()
+  }
+
+  test("TypeID generator should not accept illegal prefix") {
+    TypeID
+      .generator[IO]
+      .flatMap(generator => generator.typeid("WRONG"))
+      .intercept[IllegalArgumentException]
+
+    TypeID.generator[IO]("WRONG").intercept[IllegalArgumentException]
   }
 
   private def genN(generator: UUIDGenerator[IO], n: Int): IO[List[UUID]] =
