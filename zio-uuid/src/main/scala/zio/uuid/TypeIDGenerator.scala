@@ -1,5 +1,6 @@
 package zio.uuid
 
+import zio.prelude.Debug.Renderer
 import zio.prelude.DebugOps
 import zio.{IO, ULayer, ZIO, ZLayer}
 
@@ -28,7 +29,7 @@ object TypeIDGenerator {
             uuidGenerator.uuidV7.flatMap { uuid =>
               TypeID
                 .build(prefix, uuid)
-                .mapError(errors => new IllegalArgumentException(errors.render))
+                .mapError(errors => new IllegalArgumentException(errors.debug.render(Renderer.Scala)))
                 .toZIO
             }
         }

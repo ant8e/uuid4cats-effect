@@ -107,10 +107,11 @@ object TypeID {
       val message = "uuid is not a UUIDv7"
     }
 
-    implicit val buildErrorShow: Debug[BuildError] = Debug.make {
-      case InvalidPrefix => s"InvalidPrefix: ${InvalidPrefix.message}"
-      case InvalidUUID   => s"InvalidUUID: ${InvalidUUID.message}"
-    }
+    implicit val buildErrorShow: Debug[BuildError] =
+      Debug.make {
+        case InvalidPrefix => s"InvalidPrefix: ${InvalidPrefix.message}"
+        case InvalidUUID   => s"InvalidUUID: ${InvalidUUID.message}"
+      }
   }
 
   sealed trait DecodeError extends Product with Serializable {
