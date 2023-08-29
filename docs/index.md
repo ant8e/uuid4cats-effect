@@ -78,5 +78,5 @@ Do this instead:
 ).provideLayer(UUIDGenerator.live)
 ```
 
-The best way to inject a `UUIDGenerator` or a `TypeIDGenerator` instance is to inject its `live` layer in the boot sequence of your program 
-so that the same instance is reused everywhere in your program and you don't risk any issue.
+**The best way to inject a `UUIDGenerator` or a `TypeIDGenerator` instance is to inject its `live` layer in the boot sequence of your program 
+so that the same instance is reused everywhere in your program and you don't risk any issue.**
