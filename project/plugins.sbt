@@ -1,4 +1,4 @@
-val zioSbtVersion = "0.4.0-alpha.16"
+val zioSbtVersion = "0.4.0-alpha.16+3-8e025b92-SNAPSHOT"
 
 addSbtPlugin("dev.zio" % "zio-sbt-ecosystem" % zioSbtVersion)
 addSbtPlugin("dev.zio" % "zio-sbt-ci"        % zioSbtVersion)
@@ -10,3 +10,4 @@ addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.0.8")
 addSbtPlugin("org.typelevel" % "sbt-tpolecat"  % "0.5.0")
 
 resolvers ++= Resolver.sonatypeOssRepos("public")
+resolvers ++= Resolver.sonatypeOssRepos("snapshots")
