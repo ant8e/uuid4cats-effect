@@ -8,6 +8,7 @@ enablePlugins(
 inThisBuild(
   List(
     name                     := "zio-uuid",
+    organization             := "com.guizmaii",
     zioVersion               := "2.0.16",
     scala213                 := "2.13.11",
     scala3                   := "3.3.0",
