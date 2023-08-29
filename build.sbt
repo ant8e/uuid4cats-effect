@@ -42,7 +42,7 @@ inThisBuild(
   )
 )
 
-addCommandAlias("updateReadme", "docs/generateReadme")
+addCommandAlias("updateReadme", "reload;docs/generateReadme")
 
 lazy val root =
   project
