@@ -6,7 +6,7 @@ sidebar_label: "Getting Started"
 
 @PROJECT_BADGES@
 
-[zio-uuid](https://github.com/guizmaii/zio-uuid) is a "ZIOfied" fork
+[zio-uuid](https://github.com/guizmaii-opensource/zio-uuid) is a "ZIOfied" fork
 of [uuid4cats-effect](https://github.com/ant8e/uuid4cats-effect) by [Antoine Comte](https://github.com/ant8e)
 
 ## Introduction

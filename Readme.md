@@ -6,7 +6,7 @@
 
 [![Production Ready](https://img.shields.io/badge/Project%20Stage-Production%20Ready-brightgreen.svg)](https://github.com/zio/zio/wiki/Project-Stages) ![CI Badge](https://github.com/zio/zio-uuid/workflows/CI/badge.svg) [![Sonatype Snapshots](https://img.shields.io/nexus/s/https/oss.sonatype.org/dev.zio/zio-uuid_2.13.svg?label=Sonatype%20Snapshot)](https://oss.sonatype.org/content/repositories/snapshots/dev/zio/zio-uuid_2.13/) [![zio-uuid](https://img.shields.io/github/stars/zio/zio-uuid?style=social)](https://github.com/zio/zio-uuid)
 
-[zio-uuid](https://github.com/guizmaii/zio-uuid) is a "ZIOfied" fork
+[zio-uuid](https://github.com/guizmaii-opensource/zio-uuid) is a "ZIOfied" fork
 of [uuid4cats-effect](https://github.com/ant8e/uuid4cats-effect) by [Antoine Comte](https://github.com/ant8e)
 
 ## Introduction
