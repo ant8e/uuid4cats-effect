@@ -21,28 +21,28 @@ private[zio] object UUIDGeneratorBuilder {
     builder: UUIDBuilder[UUIDvX],
   ): UIO[UUIDvX] =
     for {
-      random <- random.nextLong
-      uuid   <- mutex.withPermit {
-                  for {
-                    timestamp     <- clock.currentTime(TimeUnit.MILLISECONDS)
-                    modifiedState <- state.modify { currentState =>
-                                       // currentTime clock may run backward
-                                       val actualTimestamp = Math.max(currentState.lastUsedEpochMillis, timestamp)
-                                       val sequence        =
-                                         if (currentState.lastUsedEpochMillis == actualTimestamp) {
-                                           currentState.sequence + 1
-                                         } else 0L
+      modifiedState <- mutex.withPermit {
+                         for {
+                           timestamp     <- clock.currentTime(TimeUnit.MILLISECONDS)
+                           modifiedState <- state.modify { currentState =>
+                                              // currentTime clock may run backward
+                                              val actualTimestamp = Math.max(currentState.lastUsedEpochMillis, timestamp)
+                                              val sequence        =
+                                                if (currentState.lastUsedEpochMillis == actualTimestamp) {
+                                                  currentState.sequence + 1
+                                                } else 0L
 
-                                       val newState = GeneratorState(lastUsedEpochMillis = actualTimestamp, sequence = sequence)
-                                       (newState, newState)
-                                     }
-                  } yield builder(
-                    modifiedState.lastUsedEpochMillis,
-                    modifiedState.sequence,
-                    random,
-                  )
-                }
-    } yield uuid
+                                              val newState = GeneratorState(lastUsedEpochMillis = actualTimestamp, sequence = sequence)
+                                              (newState, newState)
+                                            }
+                         } yield modifiedState
+                       }
+      random        <- random.nextLong
+    } yield builder(
+      modifiedState.lastUsedEpochMillis,
+      modifiedState.sequence,
+      random,
+    )
 
   // noinspection YieldingZIOEffectInspection
   def buildGenerator[UUIDvX](builder: UUIDBuilder[UUIDvX]): UIO[UIO[UUIDvX]] =
