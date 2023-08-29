@@ -33,7 +33,7 @@ with `ZIO.randomWith(_.nextUUID)`
 In order to use this library, we need to add the following line in our `build.sbt` file:
 
 ```scala
-libraryDependencies += "dev.zio" %% "zio-uuid" % "@VERSION@"
+libraryDependencies += "com.guizmaii" %% "zio-uuid" % "@VERSION@"
 ```
 
 ## Example
