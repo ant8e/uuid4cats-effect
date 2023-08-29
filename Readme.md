@@ -4,7 +4,7 @@
 
 # zio-uuid
 
-[![Production Ready](https://img.shields.io/badge/Project%20Stage-Production%20Ready-brightgreen.svg)](https://github.com/zio/zio/wiki/Project-Stages) ![CI Badge](https://github.com/zio/zio-uuid/workflows/CI/badge.svg) [![Sonatype Snapshots](https://img.shields.io/nexus/s/https/oss.sonatype.org/com.guizmaii/zio-uuid_2.13.svg?label=Sonatype%20Snapshot)](https://oss.sonatype.org/content/repositories/snapshots/com/guizmaii/zio-uuid_2.13/) [![zio-uuid](https://img.shields.io/github/stars/zio/zio-uuid?style=social)](https://github.com/zio/zio-uuid)
+[![Production Ready](https://img.shields.io/badge/Project%20Stage-Production%20Ready-brightgreen.svg)](https://github.com/zio/zio/wiki/Project-Stages) ![CI Badge](https://github.com/zio/zio-uuid/workflows/CI/badge.svg) [![Sonatype Releases](https://img.shields.io/nexus/r/https/oss.sonatype.org/com.guizmaii/zio-uuid_2.13.svg?label=Sonatype%20Release)](https://oss.sonatype.org/content/repositories/releases/com/guizmaii/zio-uuid_2.13/) [![Sonatype Snapshots](https://img.shields.io/nexus/s/https/oss.sonatype.org/com.guizmaii/zio-uuid_2.13.svg?label=Sonatype%20Snapshot)](https://oss.sonatype.org/content/repositories/snapshots/com/guizmaii/zio-uuid_2.13/) [![javadoc](https://javadoc.io/badge2/com.guizmaii/zio-uuid-docs_2.13/javadoc.svg)](https://javadoc.io/doc/com.guizmaii/zio-uuid-docs_2.13) [![zio-uuid](https://img.shields.io/github/stars/zio/zio-uuid?style=social)](https://github.com/zio/zio-uuid)
 
 [zio-uuid](https://github.com/guizmaii-opensource/zio-uuid) is a "ZIOfied" fork
 of [uuid4cats-effect](https://github.com/ant8e/uuid4cats-effect) by [Antoine Comte](https://github.com/ant8e)
@@ -33,7 +33,7 @@ with `ZIO.randomWith(_.nextUUID)`
 In order to use this library, we need to add the following line in our `build.sbt` file:
 
 ```scala
-libraryDependencies += "com.guizmaii" %% "zio-uuid" % "<version>"
+libraryDependencies += "com.guizmaii" %% "zio-uuid" % "0.0.2"
 ```
 
 ## Example
