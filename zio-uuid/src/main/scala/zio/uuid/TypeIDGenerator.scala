@@ -1,7 +1,8 @@
 package zio.uuid
 
 import zio.prelude.Debug.Renderer
-import zio.prelude.DebugOps
+import zio.prelude.{DebugOps, ZValidation}
+import zio.uuid.TypeID.validatePrefix
 import zio.{IO, ULayer, ZIO, ZLayer}
 
 trait TypeIDGenerator {
@@ -22,19 +23,10 @@ object TypeIDGenerator {
    *  Return a UUID V7 based TypeID generator
    */
   val live: ULayer[TypeIDGenerator] =
-    UUIDGenerator.live >>> ZLayer.fromZIO {
-      ZIO.serviceWith[UUIDGenerator](uuidGenerator =>
-        new TypeIDGenerator {
-          override def typeid(prefix: String): IO[IllegalArgumentException, TypeID] =
-            uuidGenerator.uuidV7.flatMap { uuid =>
-              TypeID
-                .build(prefix, uuid)
-                .mapError(errors => new IllegalArgumentException(errors.debug.render(Renderer.Scala)))
-                .toZIO
-            }
-        }
-      )
-    }
+    UUIDGenerator.live >>>
+      ZLayer.fromZIO {
+        ZIO.serviceWith[UUIDGenerator](new TypeIDGeneratorLive(_))
+      }
 
   /**
    * Accessor function
@@ -69,4 +61,12 @@ object TypeIDGenerator {
   def generate(prefix: String): ZIO[TypeIDGenerator, IllegalArgumentException, TypeID] =
     ZIO.serviceWithZIO[TypeIDGenerator](_.typeid(prefix))
 
+}
+
+final class TypeIDGeneratorLive(uuidGenerator: UUIDGenerator) extends TypeIDGenerator {
+  override def typeid(prefix: String): IO[IllegalArgumentException, TypeID] =
+    validatePrefix(prefix) match {
+      case ZValidation.Success(_, _)      => uuidGenerator.uuidV7.map(TypeID(prefix, _))
+      case ZValidation.Failure(_, errors) => ZIO.fail(new IllegalArgumentException(errors.debug.render(Renderer.Scala)))
+    }
 }
