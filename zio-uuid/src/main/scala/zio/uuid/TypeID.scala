@@ -62,6 +62,8 @@ object TypeID {
         validateUUID(uuid, enforceUUIDV7),
       )(TypeID.apply)
 
+  private val regex = "^([a-z]{0,63})(_?)([0123456789abcdefghjkmnpqrstvwxyz]+)$".r
+
   /**
    * Decode a TypeID from a string representation.
    *
@@ -73,8 +75,6 @@ object TypeID {
     typeIDString: String,
     enforceUUIDV7: Boolean = true,
   ): Validation[DecodeError, TypeID] = {
-    val regex = "^([a-z]{0,63})(_?)([0123456789abcdefghjkmnpqrstvwxyz]+)$".r
-
     def parseID(id: String): Validation[DecodeError, UUID] =
       UUIDBase32.fromBase32(id) match {
         case Left(e)                                           => Validation.fail(DecodeError.InvalidTypeID(e))
@@ -84,13 +84,8 @@ object TypeID {
 
     typeIDString match {
       case regex(prefix, sep, id) =>
-        val validatePrefix =
-          if (prefix.isEmpty && sep.isEmpty || prefix.nonEmpty && sep.nonEmpty) Validation.succeed(prefix)
-          else Validation.fail(if (prefix.isEmpty) DecodeError.BadSeparator else DecodeError.MissingSeparator)
-
-        val validateId = parseID(id)
-
-        Validation.validateWith(validatePrefix, validateId)(TypeID.apply)
+        if (prefix.isEmpty && sep.isEmpty || prefix.nonEmpty && sep.nonEmpty) parseID(id).map(TypeID(prefix, _))
+        else Validation.fail(if (prefix.isEmpty) DecodeError.BadSeparator else DecodeError.MissingSeparator)
       case _                      => Validation.fail(DecodeError.NotParseableTypeID)
     }
   }

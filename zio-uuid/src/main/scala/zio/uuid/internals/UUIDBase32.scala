@@ -2,7 +2,7 @@ package zio.uuid.internals
 
 import java.util.UUID
 import scala.annotation.switch
-import scala.util.{Failure, Success, Try}
+import scala.util.control.NonFatal
 
 object UUIDBase32 {
   private val encodingTable: Array[Char] = "0123456789abcdefghjkmnpqrstvwxyz".toArray
@@ -60,67 +60,66 @@ object UUIDBase32 {
   }
 
   def fromBase32(s: String): Either[String, UUID] = {
-    val values = Try(
-      s.map(v =>
-        (v: @switch) match {
-          case '0' => 0L
-          case '1' => 1L
-          case '2' => 2L
-          case '3' => 3L
-          case '4' => 4L
-          case '5' => 5L
-          case '6' => 6L
-          case '7' => 7L
-          case '8' => 8L
-          case '9' => 9L
-          case 'a' => 10L
-          case 'b' => 11L
-          case 'c' => 12L
-          case 'd' => 13L
-          case 'e' => 14L
-          case 'f' => 15L
-          case 'g' => 16L
-          case 'h' => 17L
-          case 'j' => 18L
-          case 'k' => 19L
-          case 'm' => 20L
-          case 'n' => 21L
-          case 'p' => 22L
-          case 'q' => 23L
-          case 'r' => 24L
-          case 's' => 25L
-          case 't' => 26L
-          case 'v' => 27L
-          case 'w' => 28L
-          case 'x' => 29L
-          case 'y' => 30L
-          case 'z' => 31L
+    @inline def decode(c: Char): Long =
+      (c: @switch) match {
+        case '0' => 0L
+        case '1' => 1L
+        case '2' => 2L
+        case '3' => 3L
+        case '4' => 4L
+        case '5' => 5L
+        case '6' => 6L
+        case '7' => 7L
+        case '8' => 8L
+        case '9' => 9L
+        case 'a' => 10L
+        case 'b' => 11L
+        case 'c' => 12L
+        case 'd' => 13L
+        case 'e' => 14L
+        case 'f' => 15L
+        case 'g' => 16L
+        case 'h' => 17L
+        case 'j' => 18L
+        case 'k' => 19L
+        case 'm' => 20L
+        case 'n' => 21L
+        case 'p' => 22L
+        case 'q' => 23L
+        case 'r' => 24L
+        case 's' => 25L
+        case 't' => 26L
+        case 'v' => 27L
+        case 'w' => 28L
+        case 'x' => 29L
+        case 'y' => 30L
+        case 'z' => 31L
+      }
+
+    if (s.length != 26) Left("String representation should be exactly 26 significant characters")
+    else {
+      try {
+        if (decode(s.charAt(0)) > 7) Left("The String representation encodes more than 128 bits")
+        else {
+          val values = s.toArray.map(decode)
+          // format: off
+          val msb = (values(0) << 61) | // We have only 3 significant bits at pos. 0 because of the padding
+            (values(1) << 56) | (values(2) << 51) | (values(3) << 46) |
+            (values(4) << 41) | (values(5) << 36) | (values(6) << 31) | (values(7) << 26) |
+            (values(8) << 21) | (values(9) << 16) | (values(10) << 11) | (values(11) << 6) |
+            (values(12) << 1) | ls1b((values(13) >> 4).toInt)
+
+          val lsb = (values(13) << 60) |
+            (values(14) << 55) | (values(15) << 50) | (values(16) << 45) | (values(17) << 40) |
+            (values(18) << 35) | (values(19) << 30) | (values(20) << 25) | (values(21) << 20) |
+            (values(22) << 15) | (values(23) << 10) | (values(24) << 5) | values(25)
+          // format: on
+
+          Right(new UUID(msb, lsb))
         }
-      )
-    )
-
-    values match {
-      case Failure(_)                               =>
-        Left("String representation contains at least an invalid characters")
-      case Success(values) if (values.length != 26) =>
-        Left("String representation should be exactly 26 significant characters")
-      case Success(values) if (values(0) > 7)       =>
-        Left("The String representation encodes more than 128 bits")
-      case Success(values)                          =>
-        // format: off
-        val msb = (values(0) << 61) | // We have only 3 significant bits at pos. 0 because of the padding
-          (values(1) << 56) | (values(2) << 51) | (values(3) << 46) |
-          (values(4) << 41) | (values(5) << 36) | (values(6) << 31) | (values(7) << 26) |
-          (values(8) << 21) | (values(9) << 16) | (values(10) << 11) | (values(11) << 6) |
-          (values(12) << 1) | ls1b((values(13) >> 4).toInt)
-
-        val lsb = (values(13) << 60) |
-          (values(14) << 55) | (values(15) << 50) | (values(16) << 45) | (values(17) << 40) |
-          (values(18) << 35) | (values(19) << 30) | (values(20) << 25) | (values(21) << 20) |
-          (values(22) << 15) | (values(23) << 10) | (values(24) << 5) | values(25)
-        // format: on
-
-        Right(new UUID(msb, lsb))
+      } catch {
+        case NonFatal(_) => Left("String representation contains at least an invalid characters")
+      }
     }
   }
 
