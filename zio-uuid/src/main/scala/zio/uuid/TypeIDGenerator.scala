@@ -65,8 +65,10 @@ object TypeIDGenerator {
 
 final class TypeIDGeneratorLive(uuidGenerator: UUIDGenerator) extends TypeIDGenerator {
   override def typeid(prefix: String): IO[IllegalArgumentException, TypeID] =
-    validatePrefix(prefix) match {
-      case ZValidation.Success(_, _)      => uuidGenerator.uuidV7.map(TypeID(prefix, _))
-      case ZValidation.Failure(_, errors) => ZIO.fail(new IllegalArgumentException(errors.debug.render(Renderer.Scala)))
+    ZIO.suspendSucceed {
+      validatePrefix(prefix) match {
+        case ZValidation.Success(_, _)      => uuidGenerator.uuidV7.map(TypeID(prefix, _))
+        case ZValidation.Failure(_, errors) => ZIO.fail(new IllegalArgumentException(errors.debug.render(Renderer.Scala)))
+      }
     }
 }
