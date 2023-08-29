@@ -15,6 +15,7 @@ inThisBuild(
     scala3                   := "3.3.0",
     crossScalaVersions -= scala212.value,
     ciEnabledBranches        := Seq("main"),
+    ciPostReleaseJobs        := Seq.empty,
     Test / parallelExecution := false,
     Test / fork              := true,
     run / fork               := true,
