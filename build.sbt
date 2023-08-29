@@ -1,67 +1,89 @@
-import com.typesafe.tools.mima.core._
+import scala.collection.immutable.Seq
 
-ThisBuild / tlBaseVersion := "0.3" // your current series x.y
-
-ThisBuild / organization := "tech.ant8e"
-ThisBuild / organizationName := "Antoine Comte"
-ThisBuild / startYear := Some(2023)
-ThisBuild / licenses := Seq(License.Apache2)
-ThisBuild / developers := List(
-  // your GitHub handle and name
-  tlGitHubDev("ant8e", "Antoine Comte")
+enablePlugins(
+  ZioSbtEcosystemPlugin,
+  ZioSbtCiPlugin,
 )
 
-// publish to s01.oss.sonatype.org (set to true to publish to oss.sonatype.org instead)
-ThisBuild / tlSonatypeUseLegacyHost := false
-
-ThisBuild / tlFatalWarnings := false
-// publish website from this branch
-//ThisBuild / tlSitePublishBranch := Some("main")
-
-val Scala213 = "2.13.11"
-ThisBuild / crossScalaVersions := Seq(Scala213, "3.3.0")
-ThisBuild / scalaVersion := Scala213 // the default Scala
-
-lazy val root = tlCrossRootProject.aggregate(core)
-
-lazy val core = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
-  .in(file("core"))
-  .settings(
-    name := "uuid4cats-effect",
-    libraryDependencies ++= Seq(
-      "org.typelevel" %%% "cats-core" % "2.10.0",
-      "org.typelevel" %%% "cats-effect" % "3.5.1",
-      "org.scalameta" %%% "munit" % "0.7.29" % Test,
-      "org.typelevel" %%% "munit-cats-effect-3" % "1.0.7" % Test
+inThisBuild(
+  List(
+    name                     := "zio-uuid",
+    zioVersion               := "2.0.16",
+    scala213                 := "2.13.11",
+    scala3                   := "3.3.0",
+    crossScalaVersions -= scala211.value,
+    crossScalaVersions -= scala212.value,
+    ciEnabledBranches        := Seq("main"),
+    Test / parallelExecution := false,
+    Test / fork              := true,
+    run / fork               := true,
+    ciJvmOptions ++= Seq("-Xms6G", "-Xmx6G", "-Xss4M", "-XX:+UseG1GC"),
+    scalafixDependencies ++= List(
+      "com.github.vovapolu"                      %% "scaluzzi" % "0.1.23",
+      "io.github.ghostbuster91.scalafix-unified" %% "unified"  % "0.0.9",
     ),
-    mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[ReversedMissingMethodProblem](
-        "tech.ant8e.uuid4cats.TimestampedUUIDGeneratorBuilder.tech$ant8e$uuid4cats$TimestampedUUIDGeneratorBuilder$$GeneratorState"
-      )
-    )
-  )
-
-lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
-
-ThisBuild / githubWorkflowAddedJobs ++= Seq(
-  WorkflowJob(
-    id = "coverage",
-    name = "Generate coverage report",
-    scalas = List(Scala213),
-    javas = List(githubWorkflowJavaVersions.value.last),
-    steps = List(WorkflowStep.Checkout) ++ WorkflowStep.SetupJava(
-      List(githubWorkflowJavaVersions.value.last)
-    ) ++ githubWorkflowGeneratedCacheSteps.value ++ List(
-      WorkflowStep.Sbt(List("coverage", "rootJVM/test", "coverageAggregate")),
-      WorkflowStep.Use(
-        UseRef.Public(
-          "codecov",
-          "codecov-action",
-          "v3"
-        ),
-        env = Map("CODECOV_TOKEN" -> "${{ secrets.CODECOV_TOKEN }}")
-      )
-    )
+    licenses                 := Seq(License.Apache2),
+    developers               := List(
+      Developer(
+        "ant8e",
+        "Antoine Comte",
+        "",
+        url("https://github.com/ant8e"),
+      ),
+      Developer(
+        "guizmaii",
+        "Jules Ivanic",
+        "",
+        url("https://github.com/guizmaii"),
+      ),
+    ),
   )
 )
+
+addCommandAlias("updateReadme", "docs/generateReadme")
+
+lazy val root =
+  project
+    .in(file("."))
+    .settings(
+      name               := "zio-uuid",
+      publish / skip     := true,
+      crossScalaVersions := Nil,// https://www.scala-sbt.org/1.x/docs/Cross-Build.html#Cross+building+a+project+statefully
+    )
+    .aggregate(
+      `zio-uuid`
+    )
+
+lazy val `zio-uuid` =
+  project
+    .in(file("zio-uuid"))
+    .settings(stdSettings(Some("zio-uuid")))
+    .settings(addOptionsOn("2.13")("-Xsource:3"))
+    .settings(
+      libraryDependencies ++= Seq(
+        "dev.zio"           %%% "zio"         % zioVersion.value,
+        "dev.zio"            %% "zio-prelude" % "1.0.0-RC20",
+        "dev.zio"           %%% "zio-json"    % "0.6.1"          % Optional,
+        "dev.zio"           %%% "zio-test"    % zioVersion.value % Test,
+        "org.scalameta"     %%% "munit"       % "0.7.29"         % Test,
+        "com.github.poslegm" %% "munit-zio"   % "0.1.1"          % Test,
+      )
+    )
+
+lazy val docs =
+  project
+    .in(file("zio-uuid-docs"))
+    .settings(
+      moduleName                                 := "zio-uuid-docs",
+      scalacOptions -= "-Yno-imports",
+      scalacOptions -= "-Xfatal-warnings",
+      projectName                                := "zio-uuid",
+      mainModuleName                             := (`zio-uuid` / moduleName).value,
+      projectStage                               := ProjectStage.ProductionReady,
+      ScalaUnidoc / unidoc / unidocProjectFilter := inProjects(`zio-uuid`),
+      readmeCredits                              :=
+        "This library is a fork of the [uuid4cats-effect](https://github.com/ant8e/uuid4cats-effect) library made by Antoine Comte (https://github.com/ant8e)",
+      readmeLicense += s"\n\nCopyright 2023-${java.time.Year.now()} Jules Ivanic and the zio-uuid contributors.",
+    )
+    .enablePlugins(WebsitePlugin)
+    .dependsOn(`zio-uuid`)
