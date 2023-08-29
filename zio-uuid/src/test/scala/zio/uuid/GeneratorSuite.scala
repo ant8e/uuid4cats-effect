@@ -17,13 +17,14 @@
 package zio.uuid
 
 import munit.ZSuite
-import zio.{URIO, ZIO}
+import zio.uuid.types.{UUIDv1, UUIDv6, UUIDv7}
+import zio.ZIO
 
 import java.util.UUID
 
 class GeneratorSuite extends ZSuite {
 
-  private val n = 10000
+  private val n = 2_000_000
 
   testZ("UUIDv1 should generate UUIDs") {
     (
@@ -55,11 +56,13 @@ class GeneratorSuite extends ZSuite {
   }
 
   testZ("TypeID should generate TypeIds") {
-    for {
-      typeids <- ZIO.collectAll(List.tabulate(n)(_ => TypeIDGenerator.generate("prefix"))).provideLayer(TypeIDGenerator.live)
-      _       <- ZIO.succeed(assert(typeids.distinct.size == typeids.size))
-      _       <- ZIO.succeed(assert(isSeqSorted(typeids)))
-    } yield ()
+    (
+      for {
+        typeids <- genN(TypeIDGenerator.generate("prefix"), n)
+        _       <- ZIO.succeed(assert(typeids.distinct.length == typeids.length))
+        _       <- ZIO.succeed(assert(isSeqSorted(typeids)))
+      } yield ()
+    ).provideLayer(TypeIDGenerator.live)
   }
 
   testZ("TypeID generator should not accept illegal prefix") {
@@ -69,16 +72,13 @@ class GeneratorSuite extends ZSuite {
       .interceptFailure[IllegalArgumentException]
   }
 
-  private def genN[R, UUIDvX](gen: URIO[R, UUIDvX], n: Int): URIO[R, List[UUIDvX]] =
-    ZIO.collectAll(List.tabulate(n)(_ => gen))
+  private def genN[R, E, UUIDvX](gen: ZIO[R, E, UUIDvX], n: Int): ZIO[R, E, Vector[UUIDvX]] =
+    ZIO.replicateZIO(n)(gen).map(Vector.from)
 
-  implicit class UUIDsOps(uuids: List[UUID]) {
-    def allUniques: Boolean = uuids.distinct.size == uuids.size
-    def isSorted: Boolean   = isSeqSorted(uuids)
-  }
-
-  private def assertAllUnique(uuids: List[UUID]) = ZIO.succeed(assert(uuids.allUniques, s"Not Unique : $uuids"))
-  private def assertSorted(uuids: List[UUID])    = ZIO.succeed(assert(uuids.isSorted, s"Not sorted : ${findNotSorted(uuids)}"))
+  private def assertAllUnique[UUIDvX](uuids: Vector[UUIDvX])        =
+    ZIO.succeed(assert(uuids.distinct.length == uuids.length, s"Not Unique : $uuids"))
+  private def assertSorted[UUIDvX: Ordering](uuids: Vector[UUIDvX]) =
+    ZIO.succeed(assert(isSeqSorted[UUIDvX](uuids), s"Not sorted : ${findNotSorted(uuids)}"))
 
   // Using a custom ordering based on String because UUID compareTo() is not reliable
   // https://github.com/scala-js/scala-js/issues/4882 and
@@ -86,16 +86,20 @@ class GeneratorSuite extends ZSuite {
   implicit val uuidOrdering: Ordering[UUID] =
     Ordering.by[UUID, String](_.toString)
 
-  def isSeqSorted[T](
-    seq: List[T]
-  )(implicit ordering: Ordering[T]): Boolean = {
+  implicit val uuidv1Ordering: Ordering[UUIDv1] = UUIDv1.wrapAll(uuidOrdering)
+  implicit val uuidv6Ordering: Ordering[UUIDv6] = UUIDv6.wrapAll(uuidOrdering)
+  implicit val uuidv7Ordering: Ordering[UUIDv7] = UUIDv7.wrapAll(uuidOrdering)
+
+  def isSeqSorted[UUIDvX](
+    seq: Vector[UUIDvX]
+  )(implicit ordering: Ordering[UUIDvX]): Boolean = {
     val lastIndex = seq.length - 1
     !seq.zipWithIndex.exists { case (t, index) =>
       index != lastIndex && ordering.gt(t, seq(index + 1))
     }
   }
 
-  def findNotSorted[T](seq: List[T])(implicit ordering: Ordering[T]): String = {
+  def findNotSorted[T](seq: Vector[T])(implicit ordering: Ordering[T]): String = {
     val lastIndex = seq.length - 1
     seq.zipWithIndex
       .find { case (t, index) =>
