@@ -339,9 +339,9 @@ object TypeID {
                 (values(14) << 55) | (values(15) << 50) | (values(16) << 45) | (values(17) << 40) |
                 (values(18) << 35) | (values(19) << 30) | (values(20) << 25) | (values(21) << 20) |
                 (values(22) << 15) | (values(23) << 10) | (values(24) << 5) | values(25)
-              // format: on
 
-          new UUID(msb, lsb).asRight
+               new UUID(msb, lsb).asRight
+              // format: on
       }
     }
 
