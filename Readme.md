@@ -29,7 +29,7 @@ To use uuid4cats-effect in an existing SBT project with Scala 2.13 or a later ve
 `build.sbt`:
 
 ```scala
-libraryDependencies += "ant8e.tech" %% "uuid4cats-effect" % "<version>"
+libraryDependencies += "tech.ant8e" %% "uuid4cats-effect" % "<version>"
 ```
 
 ## Example
