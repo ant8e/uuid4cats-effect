@@ -27,6 +27,14 @@ trait UUIDGenerator[F[_]] {
   def uuid: F[UUID]
 }
 
+object UUIDGenerator {
+
+  /** Summon an instance of UUIDGenerator for F. */
+  @inline def apply[F[_]](implicit
+      instance: UUIDGenerator[F]
+  ): UUIDGenerator[F] = instance
+}
+
 object UUIDv1 extends TimestampedUUIDGeneratorBuilder {
 
   /** return a UUIDv1 (gregorian timestamp based, non-sortable) generator with
