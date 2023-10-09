@@ -14,3 +14,6 @@ jobs:
     steps:
       - name: Scala Steward
         uses: scala-steward-org/scala-steward-action@v2.61.0
+        with:
+          github-repository: ${{ github.repository }}
+          github-token: ${{ secrets.SCALA_STEWARD }}
