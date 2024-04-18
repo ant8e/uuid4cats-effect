@@ -18,7 +18,7 @@ ThisBuild / tlFatalWarnings := false
 // publish website from this branch
 //ThisBuild / tlSitePublishBranch := Some("main")
 
-val Scala213 = "2.13.11"
+val Scala213 = "2.13.13"
 ThisBuild / crossScalaVersions := Seq(Scala213, "3.3.1")
 ThisBuild / scalaVersion := Scala213 // the default Scala
 
@@ -31,7 +31,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
     name := "uuid4cats-effect",
     libraryDependencies ++= Seq(
       "org.typelevel" %%% "cats-core" % "2.10.0",
-      "org.typelevel" %%% "cats-effect" % "3.5.1",
+      "org.typelevel" %%% "cats-effect" % "3.5.4",
       "org.scalameta" %%% "munit" % "0.7.29" % Test,
       "org.typelevel" %%% "munit-cats-effect-3" % "1.0.7" % Test
     ),
