@@ -21,7 +21,7 @@ This library add support for the following types:
 Implementation based on this [UUID RFC Draft](https://datatracker.ietf.org/doc/html/draft-ietf-uuidrev-rfc4122bis-03)
 
 In addition to UUID, there is also support for [TypeIDs](https://github.com/jetpack-io/typeid). TypeIDs are a modern, 
-type-safe extension of UUIDv7 
+type-safe extension of UUIDv7. This implementation is compatible with the [0.3.0 version of the specification](https://github.com/jetify-com/typeid/tree/main/spec#typeid-specification-version-030)
 
 ##  Quickstart
 

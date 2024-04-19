@@ -110,8 +110,7 @@ object TypeID {
       enforceUUIDV7: Boolean = true
   ): ValidatedNec[DecodeError, TypeID] = {
     val re =
-      "^([a-z]{0,63})(_?)([0123456789abcdefghjkmnpqrstvwxyz]+)$".r
-
+      "^([a-z](?:[a-z_]{0,61}[a-z])?)?(_)?([0123456789abcdefghjkmnpqrstvwxyz]{26})$".r
     def parseID(id: String): Validated[DecodeError, UUID] =
       UUIDBase32
         .fromBase32(id)
@@ -124,7 +123,7 @@ object TypeID {
         }
 
     typeIDString match {
-      case re(prefix, sep, id) =>
+      case re(prefix, sep, id) if prefix != null && sep != null =>
         (
           Validated
             .cond(
@@ -135,6 +134,8 @@ object TypeID {
             .toValidatedNec,
           parseID(id).toValidatedNec
         ).mapN { case (prefix_, uuid_) => newTypeID(prefix_, uuid_) }
+      case re(null, null, id) =>
+        parseID(id).toValidatedNec.map(uuid => newTypeID("", uuid))
       case _ => Validated.invalidNec(NotParseableTypeID)
     }
 
@@ -207,7 +208,7 @@ object TypeID {
       prefix: String
   ): Validated[BuildError, String] = Option(prefix)
     .map(prefix_ => {
-      if ("[a-z]{0,63}".r.matches(prefix_))
+      if ("^([a-z]([a-z_]{0,61}[a-z])?)?$".r.matches(prefix_))
         Validated.Valid(prefix_)
       else Validated.Invalid(InvalidPrefix)
     })
