@@ -82,7 +82,15 @@ class TypeIDSuite extends FunSuite {
       prefix = "prefix",
       uuid = uuid"01890a5d-ac96-774b-bcce-b302099a8057"
     )
+
+    // prefix-underscore added in v0.3.0
+    assertValidEncoding(
+      typeID = "pre_fix_00000000000000000000000000",
+      prefix = "pre_fix",
+      uuid = uuid"00000000-0000-0000-0000-000000000000"
+    )
   }
+
   test("TypeID should not  build invalid typeIDs") {
     val tooLongPrefix =
       "0123456789012345678901234567890123456789012345678901234567890123456789"
@@ -167,9 +175,6 @@ class TypeIDSuite extends FunSuite {
     // prefix-period
     assertInvalidDecoding(typeID = "pre.fix_00000000000000000000000000")
 
-    // prefix-underscore
-    assertInvalidDecoding(typeID = "pre_fix_00000000000000000000000000")
-
     // prefix-non-ascii
     assertInvalidDecoding(typeID = "préfix_00000000000000000000000000")
 
@@ -224,6 +229,17 @@ class TypeIDSuite extends FunSuite {
     assertInvalidDecoding(
       typeID = "prefix0000000000000000000000000g"
     )
+
+    // prefix-underscore-start
+    assertInvalidDecoding(
+      typeID = "_prefix_00000000000000000000000000"
+    )
+
+    // prefix-underscore-end
+    assertInvalidDecoding(
+      typeID = "prefix__00000000000000000000000000"
+    )
+
   }
 
   test("TypeID should have an Eq instance") {
