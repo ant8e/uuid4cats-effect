@@ -1,6 +1,6 @@
 import com.typesafe.tools.mima.core._
 
-ThisBuild / tlBaseVersion := "0.3" // your current series x.y
+ThisBuild / tlBaseVersion := "0.4" // your current series x.y
 
 ThisBuild / organization := "tech.ant8e"
 ThisBuild / organizationName := "Antoine Comte"
