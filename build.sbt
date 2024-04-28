@@ -25,7 +25,7 @@ ThisBuild / scalaVersion := Scala213 // the default Scala
 lazy val root = tlCrossRootProject.aggregate(core)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .in(file("core"))
   .settings(
     name := "uuid4cats-effect",
@@ -41,9 +41,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
         "tech.ant8e.uuid4cats.TimestampedUUIDGeneratorBuilder.tech$ant8e$uuid4cats$TimestampedUUIDGeneratorBuilder$$GeneratorState"
       )
     )
-  )
-  .jsSettings(
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.5.0"
   )
 
 lazy val docs = project.in(file("site")).enablePlugins(TypelevelSitePlugin)
