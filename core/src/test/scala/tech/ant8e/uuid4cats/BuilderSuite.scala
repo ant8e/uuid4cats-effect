@@ -23,11 +23,9 @@ import java.util.UUID
 class BuilderSuite extends FunSuite {
 
   test("UUIDBuilder should correctly build UUIDv1") {
-    // Differ by one bit of the test value in the RFC as we force the unicast bit to 1
     val expected = uuid"C232AB00-9414-11EC-B3C8-9F6BDECED846"
-
     val obtained =
-      UUIDBuilder.buildUUIDv1(1645557742000L, 0x33c8L, 0x9e6bdeced846L)
+      UUIDBuilder.buildUUIDv1(1645557742000L, 0x33c8L, 0x9f6bdeced846L)
     assertEquals(obtained, expected)
   }
 
