@@ -1,6 +1,6 @@
 import com.typesafe.tools.mima.core._
 
-ThisBuild / tlBaseVersion := "0.4" // your current series x.y
+ThisBuild / tlBaseVersion := "0.5" // your current series x.y
 
 ThisBuild / organization := "tech.ant8e"
 ThisBuild / organizationName := "Antoine Comte"
@@ -35,11 +35,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.scalameta" %%% "munit" % "0.7.29" % Test,
       "org.typelevel" %%% "munit-cats-effect-3" % "1.0.7" % Test,
       "org.scalameta" %%% "munit-scalacheck" % "0.7.29" % Test
-    ),
-    mimaBinaryIssueFilters ++= Seq(
-      ProblemFilters.exclude[ReversedMissingMethodProblem](
-        "tech.ant8e.uuid4cats.TimestampedUUIDGeneratorBuilder.tech$ant8e$uuid4cats$TimestampedUUIDGeneratorBuilder$$GeneratorState"
-      )
     )
   )
 
