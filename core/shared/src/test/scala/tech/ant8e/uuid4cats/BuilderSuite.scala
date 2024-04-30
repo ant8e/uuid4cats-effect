@@ -16,6 +16,8 @@
 
 package tech.ant8e.uuid4cats
 
+import cats.syntax.all.*
+import cats.~>
 import munit.FunSuite
 
 import java.util.UUID
@@ -48,6 +50,20 @@ class BuilderSuite extends FunSuite {
     val obtained =
       UUIDBuilder.buildUUIDV7(0x17f22e279b0L, 0xcc3L, 0x18c4dc0c0c07398fL)
     assertEquals(obtained, expected)
+  }
+
+  test("UUIDGenerator accepts natural transformations") {
+    val generator: UUIDGenerator[List] = new UUIDGenerator[List] {
+      def uuid: List[UUID] = List(
+        uuid"017F22E2-79B0-7CC3-98C4-DC0C0C07398F",
+        uuid"017F22E2-79B0-7CC3-98C4-DC0C0C07398F"
+      )
+    }
+    val listToOption = new (List ~> Option) {
+      override def apply[A](fa: List[A]): Option[A] = fa.headOption
+    }
+    val obtained = generator.mapK(listToOption).uuid
+    assertEquals(obtained, uuid"017F22E2-79B0-7CC3-98C4-DC0C0C07398F".some)
   }
 
   implicit class uuidOps(sc: StringContext) {

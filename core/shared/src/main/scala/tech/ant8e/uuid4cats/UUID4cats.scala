@@ -19,12 +19,18 @@ package tech.ant8e.uuid4cats
 import cats.effect.std.{Mutex, Random, SecureRandom}
 import cats.effect.{Async, Clock, Ref}
 import cats.syntax.all.*
+import cats.~>
 import tech.ant8e.uuid4cats.TimestampedUUIDGeneratorBuilder.GeneratorState
 
 import java.util.UUID
 
 trait UUIDGenerator[F[_]] {
   def uuid: F[UUID]
+  def mapK[G[_]](fk: F ~> G): UUIDGenerator[G] = {
+    new UUIDGenerator[G] {
+      override def uuid: G[UUID] = fk(UUIDGenerator.this.uuid)
+    }
+  }
 }
 
 object UUIDGenerator {
