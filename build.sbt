@@ -25,7 +25,7 @@ ThisBuild / scalaVersion := Scala213 // the default Scala
 lazy val root = tlCrossRootProject.aggregate(core)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform)
-  .crossType(CrossType.Pure)
+  .crossType(CrossType.Full)
   .in(file("core"))
   .settings(
     name := "uuid4cats-effect",
@@ -33,7 +33,8 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel" %%% "cats-core" % "2.10.0",
       "org.typelevel" %%% "cats-effect" % "3.5.4",
       "org.scalameta" %%% "munit" % "0.7.29" % Test,
-      "org.typelevel" %%% "munit-cats-effect-3" % "1.0.7" % Test
+      "org.typelevel" %%% "munit-cats-effect-3" % "1.0.7" % Test,
+      "org.scalameta" %%% "munit-scalacheck" % "0.7.29" % Test
     ),
     mimaBinaryIssueFilters ++= Seq(
       ProblemFilters.exclude[ReversedMissingMethodProblem](

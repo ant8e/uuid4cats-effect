@@ -1,5 +1,6 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/tech.ant8e/uuid4cats-effect_2.13/badge.svg)](https://maven-badges.herokuapp.com/maven-central/tech.ant8e/uuid4cats-effect_2.13)
+[![javadoc](https://javadoc.io/badge2/tech.ant8e/uuid4cats-effect_2.13/javadoc.svg)](https://javadoc.io/doc/tech.ant8e/uuid4cats-effect_2.13)
 [![Code of Conduct](https://img.shields.io/badge/Code%20of%20Conduct-Scala-blue.svg)](CODE_OF_CONDUCT.md)
 ![](https://github.com/ant8e/uuid4cats-effect/actions/workflows/ci.yml/badge.svg)
 [![codecov](https://codecov.io/gh/ant8e/uuid4cats-effect/branch/main/graph/badge.svg?token=QEUSQ3T053)](https://codecov.io/gh/ant8e/uuid4cats-effect)
@@ -11,12 +12,12 @@ Although cats-effect has some support for [generating UUIDs](https://typelevel.o
 
 This library add support for the following types:
 
-|         |         time-based         | sortable | random |
-|--------:|:--------------------------:|:--------:|:------:|
-| UUID v1 | ✅ <br/> gregorian calendar |          |        |
-| UUID v4 |                            |          |   ✅    |
-| UUID v6 | ✅ <br/> gregorian calendar |    ✅    |        |
-| UUID v7 |     ✅ <br/>unix epoch      |    ✅    |   ✅    |
+|         |            time-based            | sortable | random |
+|--------:|:--------------------------------:|:--------:|:------:|
+| UUID v1 |   ✅ <br/> gregorian calendar    |          |        |
+| UUID v4 |                                  |          |   ✅   |
+| UUID v6 |   ✅ <br/> gregorian calendar    |    ✅    |        |
+| UUID v7 |        ✅ <br/>unix epoch        |    ✅    |        |
 
 Implementation based on this [UUID RFC Draft](https://datatracker.ietf.org/doc/html/draft-ietf-uuidrev-rfc4122bis-14)
 
@@ -32,12 +33,15 @@ To use uuid4cats-effect in an existing SBT project with Scala 2.13 or a later ve
 libraryDependencies += "tech.ant8e" %% "uuid4cats-effect" % "<version>"
 ```
 
+uuid4cats-effect is published for Scala 2.13, and 3 on JVM and JS.
+
 ## Example
 
 ```scala
 import cats.effect.IO
 import cats.effect.unsafe.implicits.global
 import tech.ant8e.uuid4cats.UUIDv6
+import tech.ant8e.uuid4cats.UUIDUtil
 import tech.ant8e.uuid4cats.TypeID
 
 val ids = for {
@@ -46,12 +50,14 @@ val ids = for {
   uuid1 <- generator.uuid
   uuid2 <- generator.uuid
   typeid <- typeIDGenerator.typeid("myprefix")
-} yield (uuid1, uuid2, typeid.value)
+  ts = UUIDUtil.extractTimestamp(uuid1)
+} yield (uuid1, uuid2, typeid.value, ts)
 
 ids.unsafeRunSync()
 
+
 val ids: cats.effect.IO[(java.util.UUID, java.util.UUID, String)] = IO(...)
-val res1: (java.util.UUID, java.util.UUID, String) = (1ee22392-7669-6aa0-8000-ca7de6e5d540,1ee22392-766c-61b0-8000-422a97a9dbaa,myprefix_01h5a2ccabe0080m1hrkj0p0qp)
+val res1: (java.util.UUID, java.util.UUID, String) = (1ee22392-7669-6aa0-8000-ca7de6e5d540,1ee22392-766c-61b0-8000-422a97a9dbaa,myprefix_01h5a2ccabe0080m1hrkj0p0qp, Some(2024-04-28T11:10:44.501Z))
 ```
 
 Uniqueness of generated time-based UUIDs is guaranteed when using the same generator. 
