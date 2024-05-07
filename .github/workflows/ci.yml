@@ -12,7 +12,9 @@ env:
   push:
     branches:
     - main
-  pull_request: {}
+  pull_request:
+    branches-ignore:
+    - gh-pages
 jobs:
   build:
     name: Build
