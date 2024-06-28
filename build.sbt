@@ -48,7 +48,7 @@ lazy val root =
     .settings(
       name               := "zio-uuid",
       publish / skip     := true,
-      crossScalaVersions := Nil,// https://www.scala-sbt.org/1.x/docs/Cross-Build.html#Cross+building+a+project+statefully
+      crossScalaVersions := Nil, // https://www.scala-sbt.org/1.x/docs/Cross-Build.html#Cross+building+a+project+statefully
     )
     .aggregate(
       `zio-uuid`
