@@ -259,6 +259,25 @@ class TypeIDSuite extends FunSuite {
     )
   }
 
+  test("TypeID should have a hashCode") {
+    // same id but different instances
+    val idString = "prefix_01h455vb4pex5vsknk084sn02q"
+    val id1_1 = TypeID.decode(idString).toOption.get
+    val id1_2 = TypeID.decode(idString).toOption.get
+    // other id
+    val id2 = TypeID.decode("prefix_01h455vb4pex5vsknk084sn02r").toOption.get
+    assertEquals(
+      List(
+        (id1_1, 1),
+        (id1_2, 3),
+        (id2, 5)
+      ).groupBy(_._1) // will group only when hashCode is the same
+        .map(_._2.map(_._2).sum)
+        .toSet,
+      Set(1 + 3, 5)
+    )
+  }
+
   private def assertValidEncoding(
       typeID: String,
       prefix: String,
