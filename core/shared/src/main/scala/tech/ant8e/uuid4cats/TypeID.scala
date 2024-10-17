@@ -202,6 +202,11 @@ object TypeID {
       case _             => false
     }
 
+    override def hashCode(): Int = {
+      val prime = 31
+      prime * (prime + prefix.hashCode) + uuid.hashCode
+    }
+
   }
 
   private[uuid4cats] def validatePrefix(
