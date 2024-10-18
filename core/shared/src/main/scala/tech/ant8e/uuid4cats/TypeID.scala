@@ -202,10 +202,12 @@ object TypeID {
       case _             => false
     }
 
-    override def hashCode(): Int = {
+    private lazy val hashCodeComputation: Int = {
       val prime = 31
-      prime * (prime + prefix.hashCode) + uuid.hashCode
+      prime * (prime + prefix_.hashCode) + uuid_.hashCode
     }
+
+    override def hashCode(): Int = hashCodeComputation
 
   }
 
