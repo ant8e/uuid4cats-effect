@@ -19,7 +19,7 @@ ThisBuild / tlFatalWarnings := false
 //ThisBuild / tlSitePublishBranch := Some("main")
 
 val Scala213 = "2.13.16"
-ThisBuild / crossScalaVersions := Seq(Scala213, "3.3.4")
+ThisBuild / crossScalaVersions := Seq(Scala213, "3.3.5")
 ThisBuild / scalaVersion := Scala213 // the default Scala
 
 lazy val root = tlCrossRootProject.aggregate(core)
