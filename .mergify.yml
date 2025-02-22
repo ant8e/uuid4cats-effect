@@ -2,10 +2,10 @@ pull_request_rules:
   - name: Automatic merge of scala-steward PR
     conditions:
       - author=scala-steward
-      - check-success=Build and Test (ubuntu-latest, 2.13, temurin@8, rootJVM) 
-      - check-success=Build and Test (ubuntu-latest, 2.13, temurin@8, rootJS) 
-      - check-success=Build and Test (ubuntu-latest, 3, temurin@8, rootJVM) 
-      - check-success=Build and Test (ubuntu-latest, 3, temurin@8, rootJS) 
+      - check-success=Test (ubuntu-22.04, 3, temurin@8, rootJVM) 
+      - check-success=Test (ubuntu-22.04, 3, temurin@8, rootJS)  
+      - check-success=Test (ubuntu-22.04, 2.13, temurin@8, rootJVM) 
+      - check-success=Test (ubuntu-22.04, 2.13, temurin@8, rootJS)  
     actions:
       merge:
         method: merge
