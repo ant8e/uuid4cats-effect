@@ -66,7 +66,7 @@ lazy val `zio-uuid` =
         "dev.zio"           %%% "zio-json"    % "0.7.42"         % Optional,
         "dev.zio"           %%% "zio-test"    % zioVersion.value % Test,
         "org.scalameta"     %%% "munit"       % "1.1.1"          % Test,
-        "com.github.poslegm" %% "munit-zio"   % "0.3.0"          % Test,
+        "com.github.poslegm" %% "munit-zio"   % "0.4.0"          % Test,
       )
     )
 
