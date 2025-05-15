@@ -10,7 +10,7 @@ inThisBuild(
     homepage                 := Some(url("https://github.com/guizmaii-opensource/zio-uuid")),
     zioVersion               := "2.1.17",
     scala213                 := "2.13.16",
-    scala3                   := "3.3.5",
+    scala3                   := "3.3.6",
     crossScalaVersions -= scala212.value,
     ciEnabledBranches        := Seq("main"),
     ciPostReleaseJobs        := Seq.empty,
