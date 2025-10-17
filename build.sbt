@@ -18,7 +18,7 @@ ThisBuild / tlFatalWarnings := false
 // publish website from this branch
 //ThisBuild / tlSitePublishBranch := Some("main")
 
-val Scala213 = "2.13.16"
+val Scala213 = "2.13.17"
 ThisBuild / crossScalaVersions := Seq(Scala213, "3.3.7")
 ThisBuild / scalaVersion := Scala213 // the default Scala
 
