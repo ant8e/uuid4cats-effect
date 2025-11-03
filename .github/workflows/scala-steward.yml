@@ -1,10 +1,18 @@
 name: Scala Steward
 
-# This workflow will launch everyday at 00:00
+env:
+  JDK_JAVA_OPTIONS: -XX:+PrintCommandLineFlags -Xms2G -Xmx8G -Xss4M -XX:+UseG1GC -XX:ReservedCodeCacheSize=512M -XX:NonProfiledCodeHeapSize=256M # JDK_JAVA_OPTIONS is _the_ env. variable to use for modern Java
+  SBT_OPTS: -XX:+PrintCommandLineFlags -Xms2G -Xmx8G -Xss4M -XX:+UseG1GC -XX:ReservedCodeCacheSize=512M -XX:NonProfiledCodeHeapSize=256M # Needed for sbt
+
+# This workflow will launch every day at 00:00
 on:
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   scala-steward:
@@ -12,9 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Scala Steward
     steps:
-      - uses: sbt/setup-sbt@v1
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
       - name: Scala Steward
-        uses: scala-steward-org/scala-steward-action@v2.65.0
+        uses: scala-steward-org/scala-steward-action@v2
         with:
           github-repository: ${{ github.repository }}
           github-token: ${{ secrets.SCALA_STEWARD }}
