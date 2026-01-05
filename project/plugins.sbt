@@ -1,5 +1,5 @@
 addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.7.7")
 addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % "0.7.7")
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.1")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.2")
 addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.8.2")
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "2.4.3")
