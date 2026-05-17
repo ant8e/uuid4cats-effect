@@ -34,7 +34,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform)
       "org.typelevel" %%% "cats-effect" % "3.6.3",
       "org.scalameta" %%% "munit" % "1.2.4" % Test,
       "org.typelevel" %%% "munit-cats-effect" % "2.2.0" % Test,
-      "org.scalameta" %%% "munit-scalacheck" % "1.2.0" % Test
+      "org.scalameta" %%% "munit-scalacheck" % "1.3.0" % Test
     )
   )
 
